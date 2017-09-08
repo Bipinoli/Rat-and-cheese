@@ -12,12 +12,13 @@ function Node(x, y) {
 	this.parenty = 0;
 }
 
-var srcColor = [222,50,10];
-var sinkColor = [10,50,222];
-var blockColor = [10,222,50];
-var exploredColor = [225,225,0];
-var scoutColor = [255,255,100];
-var unchartedColor = [122,122,122];
+var srcColor = [0,225,0];
+var sinkColor = [10,100,222];
+var blockColor = [122,122,122];
+var exploredColor = [125,125,0];
+var scoutColor = [80,100,20];
+var unchartedColor = [10,100,50];
+var pathColor = [100,200,200];
 var nodeSize = 20;
 var cols = 480;
 var rows = 480;
@@ -42,6 +43,7 @@ for (var i=0; i<r; i++)
 		graph[i][j] = new Node(i,j);
 
 
+
 function setup() {
 	createCanvas(cols,rows);
 	background(0);
@@ -56,13 +58,13 @@ function setup() {
 function draw() {
 	if (!alreadyRun && mouseIsPressed) 
 		createBlocks();
-	// for (var i=0; i<r; i++)
-	// 	for (var j=0; j<c; j++) {
-	// 		var node = graph[i][j];
-	// 		stroke(node.color);
-	// 		fill(node.color);
-	// 		rect(node.pixelx, node.pixely, nodeSize, nodeSize);
-	// 	}
+	for (var i=0; i<r; i++)
+		for (var j=0; j<c; j++) {
+			var node = graph[i][j];
+			stroke(node.color);
+			fill(node.color);
+			rect(node.pixelx, node.pixely, nodeSize, nodeSize);
+		}
 }
 
 function mouseClicked() {
@@ -115,18 +117,18 @@ function createBlocks() {
 function run() {
 	if (alreadyRun) return;
 	alreadyRun = true;
-	noLoop();
 	aStar();
-	// var node = graph[sinkx][sinky];
-	// while (node.x != srcx || node.y != srcy) {
-	// 	redraw();
-	// 	var parent  = graph[node.parentx][node.parenty];
-	// 	stroke(srcColor);
-	// 	fill(srcColor);
-	// 	rect(node.pixelx, node.pixely, nodeSize, nodeSize);
-	// 	node = parent;
-	// }
-	loop();
+	var node = graph[sinkx][sinky];
+	while (node.x != srcx || node.y != srcy) {
+		var parent  = graph[node.parentx][node.parenty];
+		stroke(pathColor);
+		fill(pathColor);
+		graph[node.x][node.y].color = pathColor;
+		rect(node.pixelx, node.pixely, nodeSize, nodeSize);
+		node = parent;
+	}
+	graph[srcx][srcy].color = srcColor;
+	graph[sinkx][sinky].color = sinkColor;
 }
 
 
@@ -141,14 +143,8 @@ function aStar() {
 
 	while (!pq.empty()) {
 		var root = pq.pop();
-		//graph[root.x][root.y].color = exploredColor;
 
-		stroke(exploredColor);
-		fill(exploredColor);
-		rect(root.pixelx, root.pixely, nodeSize, nodeSize);
-
-		redraw();
-
+		graph[root.x][root.y].color = exploredColor;
 
 		if (root.x == sinkx && root.y == sinky) 
 			return;
